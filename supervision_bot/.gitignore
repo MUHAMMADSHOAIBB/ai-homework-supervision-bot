@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+data/supervision.db
+data/tts_cache/
+*.pt
+.env

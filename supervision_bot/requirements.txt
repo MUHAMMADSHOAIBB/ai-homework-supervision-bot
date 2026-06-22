@@ -1,0 +1,28 @@
+# Core CV
+opencv-python
+mediapipe
+ultralytics
+
+# State machine
+transitions
+
+# TTS
+edge-tts
+pyttsx3
+pygame
+
+# API / backend
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+sse-starlette
+
+# Data
+aiosqlite
+sqlalchemy
+
+# Utilities
+numpy
+Pillow
+asyncio-mqtt

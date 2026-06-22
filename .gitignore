@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+supervision_bot/venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+*.env
+
+# Database
+supervision_bot/data/*.db
+supervision_bot/data/*.db-journal
+
+# TTS audio cache (auto-generated)
+supervision_bot/data/tts_cache/
+
+# YOLO model weights (large binary files)
+supervision_bot/yolov8*.pt
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code session data
+.claude/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Node (dashboard dev server)
+node_modules/
+dist/

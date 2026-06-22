@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <w:body>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="480" w:after="480" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="52"/>
+        </w:rPr>
+        <w:t>周工作汇报表</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="2"/>
+        <w:spacing w:before="320" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0"/>
+        <w:jc w:val="center"/>
+        <w:outlineLvl w:val="1"/>
+      </w:pPr>
+      <w:bookmarkStart w:name="heading_0" w:id="0"/>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="32"/>
+        </w:rPr>
+        <w:t>周工作汇报表</w:t>
+      </w:r>
+      <w:bookmarkEnd w:id="0"/>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>姓名：                                 部门：</w:t>
+        <w:br/>
+      <w:t>汇报周期：</w:t></w:r>
+      
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+        <w:t>2026</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t xml:space="preserve"> 年</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+        <w:t>06</w:t>
+      </w:r>
+
+
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>月</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+        <w:t>16</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>日</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t xml:space="preserve">— </w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+        <w:t>2026</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>年</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+        <w:t>06</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>月</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+        <w:t>20</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>日</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="3"/>
+        <w:spacing w:before="300" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0"/>
+        <w:jc w:val="left"/>
+        <w:outlineLvl w:val="2"/>
+      </w:pPr>
+      <w:bookmarkStart w:name="heading_1" w:id="1"/>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="30"/>
+        </w:rPr>
+        <w:t>一、本周完成工作（重点/成果/数据）</w:t>
+      </w:r>
+      <w:bookmarkEnd w:id="1"/>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>1. 工作事项（1）</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t xml:space="preserve">实际完成情况：                </w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t xml:space="preserve">完成度（%）： </w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>未完成原因/备注：</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>2. 工作事项（2）</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t xml:space="preserve">实际完成情况：              </w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>完成度（%）：</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>未完成原因/备注：</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="3"/>
+        <w:spacing w:before="300" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0"/>
+        <w:jc w:val="left"/>
+        <w:outlineLvl w:val="2"/>
+      </w:pPr>
+      <w:bookmarkStart w:name="heading_2" w:id="2"/>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="30"/>
+        </w:rPr>
+        <w:t>二、遇到的问题与需要协调支持</w:t>
+      </w:r>
+      <w:bookmarkEnd w:id="2"/>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>1. 问题一：</w:t>
+        <w:br/>
+      <w:t>需要支持：</w:t></w:r>
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>2. 问题二：</w:t>
+        <w:br/>
+      <w:t>需要支持：</w:t></w:r>
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="3"/>
+        <w:spacing w:before="300" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0"/>
+        <w:jc w:val="left"/>
+        <w:outlineLvl w:val="2"/>
+      </w:pPr>
+      <w:bookmarkStart w:name="heading_3" w:id="3"/>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="30"/>
+        </w:rPr>
+        <w:t>三、下周工作计划（优先级 / 目标）</w:t>
+      </w:r>
+      <w:bookmarkEnd w:id="3"/>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>1. AI监督系统测试与误报验证（优先级：■高 □中 □低）</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>验证写作检测防误报修复效果，测试各检测模块准确率，收集反馈</w:t>
+      </w:r>
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>2. 项目文档整理与演示材料准备（优先级：□高 ■中 □低）</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>整理系统架构文档，制作项目汇报演示材料</w:t>
+      </w:r>
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="3"/>
+        <w:spacing w:before="300" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0"/>
+        <w:jc w:val="left"/>
+        <w:outlineLvl w:val="2"/>
+      </w:pPr>
+      <w:bookmarkStart w:name="heading_4" w:id="4"/>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:color w:val="3370ff"/>
+          <w:sz w:val="30"/>
+        </w:rPr>
+        <w:t xml:space="preserve">1. </w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="30"/>
+        </w:rPr>
+        <w:t>备注/其他</w:t>
+      </w:r>
+      <w:bookmarkEnd w:id="4"/>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:before="120" w:after="120" w:line="288" w:lineRule="auto"/>
+        <w:ind w:left="0" w:firstLine="0"/>
+        <w:jc w:val="left"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>填表人签字：</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+        <w:t xml:space="preserve">          </w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t xml:space="preserve">      组长确认：_____     日期：____</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>年</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>____</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>月</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>____</w:t>
+      </w:r>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:eastAsia="等线" w:ascii="Arial" w:cs="Arial" w:hAnsi="Arial"/>
+          <w:b w:val="true"/>
+          <w:sz w:val="22"/>
+        </w:rPr>
+        <w:t>日</w:t>
+      </w:r>
+    </w:p>
+    <w:sectPr>
+      <w:footerReference w:type="default" r:id="rId3"/>
+      <w:headerReference w:type="default" r:id="rId4"/>
+      <w:pgSz w:orient="portrait" w:h="16840" w:w="11905"/>
+    </w:sectPr>
+  </w:body>
+</w:document>

@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AI 作业监督助手</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0f172a;color:#f1f5f9;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:24px}
+    h1{font-size:1.5rem;font-weight:700}
+    .header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+    .header-left p{font-size:.8rem;color:#94a3b8;margin-top:4px}
+    .dot-green{color:#4ade80} .dot-red{color:#f87171}
+    .header-right{display:flex;align-items:center;gap:10px}
+    input.name-input{background:#1e293b;color:#f1f5f9;border:1px solid #475569;border-radius:8px;padding:8px 12px;font-size:.85rem;width:110px;outline:none}
+    input.name-input:focus{border-color:#3b82f6}
+    button.btn{padding:8px 22px;border-radius:10px;font-weight:600;font-size:.9rem;border:none;cursor:pointer;color:#fff;transition:background .2s}
+    button.btn-start{background:#2563eb} button.btn-start:hover{background:#1d4ed8}
+    button.btn-stop{background:#dc2626}  button.btn-stop:hover{background:#b91c1c}
+    button.btn:disabled{opacity:.5;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    @media(max-width:768px){.grid{grid-template-columns:1fr}}
+    .card{background:#1e293b;border-radius:16px;padding:20px;box-shadow:0 4px 20px #0004}
+    .card h2{font-size:1rem;font-weight:600;color:#e2e8f0;margin-bottom:14px}
+    .state-badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;color:#fff}
+    .badge-IDLE{background:#4b5563} .badge-PREPARE{background:#15803d}
+    .badge-FOCUS{background:#1d4ed8} .badge-BREAK{background:#0f766e}
+    .badge-RESUME_CHECK{background:#b45309} .badge-COMPLETE{background:#7e22ce}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .status-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.85rem;color:#cbd5e1}
+    .indicator{width:12px;height:12px;border-radius:50%;display:inline-block;flex-shrink:0}
+    .ind-green{background:#4ade80} .ind-orange{background:#fb923c} .ind-red{background:#f87171} .ind-gray{background:#6b7280}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .pulsing{animation:pulse 1.8s infinite}
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    .stat-box{text-align:center;background:#0f172a;border-radius:10px;padding:10px}
+    .stat-val{font-size:1.4rem;font-weight:700;color:#fff}
+    .stat-lbl{font-size:.7rem;color:#64748b;margin-top:3px}
+    .last-event{margin-top:12px;font-size:.75rem;color:#fbbf24}
+    /* Timeline */
+    .timeline{max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px}
+    .timeline::-webkit-scrollbar{width:4px} .timeline::-webkit-scrollbar-track{background:#0f172a}
+    .timeline::-webkit-scrollbar-thumb{background:#475569;border-radius:2px}
+    .ev-item{border-left:4px solid;border-radius:0 8px 8px 0;padding:8px 10px;display:flex;align-items:flex-start;gap:10px}
+    .ev-high{border-color:#ef4444;background:#450a0a} .ev-med{border-color:#f59e0b;background:#451a03} .ev-low{border-color:#475569;background:#0f172a}
+    .ev-icon{font-size:1.1rem;line-height:1;margin-top:1px}
+    .ev-name{font-size:.82rem;font-weight:500;color:#e2e8f0}
+    .ev-time{font-size:.72rem;color:#64748b}
+    .ev-badge{font-size:.68rem;color:#94a3b8;margin-left:6px}
+    .empty-msg{text-align:center;color:#475569;font-size:.85rem;padding:32px 0}
+    /* Charts */
+    svg.chart{width:100%;overflow:visible}
+    .chart-area{background:#0f172a;border-radius:10px;padding:12px}
+    /* Summary */
+    .summary-card{background:#1e293b;border-radius:16px;padding:20px;border:1px solid #7e22ce;margin-bottom:20px}
+    .summary-card h2{color:#c084fc;margin-bottom:16px}
+    .sum-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+    .sum-box{text-align:center;background:#0f172a;border-radius:10px;padding:10px}
+    .ev-counts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .ev-chip{font-size:.75rem;background:#0f172a;color:#cbd5e1;padding:3px 9px;border-radius:6px}
+    .ai-summary{font-size:.82rem;color:#cbd5e1;background:#0f172a;border-radius:10px;padding:10px;font-style:italic}
+    /* Live bar */
+    .live-bar{margin-top:16px;background:#1e293b;border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:14px;font-size:.75rem;color:#64748b}
+    .live-bar span b{color:#94a3b8}
+    /* Axis labels */
+    text.axis{font-size:11px;fill:#64748b}
+    line.grid-line{stroke:#1e293b;stroke-width:1}
+    .ref-line{stroke:#334155;stroke-dasharray:4 4;stroke-width:1}
+
+    /* ── Chat Panel ── */
+    #chat-fab{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;font-size:1.4rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px #0006;transition:background .2s;background:#2563eb;color:#fff}
+    #chat-panel{position:fixed;bottom:92px;right:24px;z-index:998;width:320px;height:480px;background:#1e293b;border:1px solid #334155;border-radius:20px;display:none;flex-direction:column;box-shadow:0 8px 40px #0008;overflow:hidden}
+    #chat-panel.open{display:flex}
+    .chat-header{background:#0f172a;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+    .chat-avatar{width:36px;height:36px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .chat-title{font-size:.88rem;font-weight:600;color:#f1f5f9}
+    .chat-subtitle{font-size:.72rem;color:#4ade80}
+    #chat-greet-btn{margin-left:auto;font-size:.72rem;padding:4px 9px;border-radius:8px;border:none;cursor:pointer;background:#1d4ed8;color:#fff;display:none}
+    #chat-greet-btn.show{display:block}
+    #chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+    #chat-messages::-webkit-scrollbar{width:4px}
+    #chat-messages::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+    .msg{max-width:86%;display:flex;flex-direction:column}
+    .msg.coach{align-self:flex-start}
+    .msg.student{align-self:flex-end;align-items:flex-end}
+    .msg-sender{font-size:.68rem;color:#60a5fa;margin-bottom:3px;font-weight:600}
+    .msg-bubble{padding:9px 12px;border-radius:16px;font-size:.82rem;line-height:1.45;color:#f1f5f9}
+    .msg.coach .msg-bubble{background:#334155;border-radius:16px 16px 16px 4px}
+    .msg.student .msg-bubble{background:#2563eb;border-radius:16px 16px 4px 16px}
+    .msg-time{font-size:.65rem;color:#475569;margin-top:3px}
+    .chat-thinking{align-self:flex-start;background:#334155;padding:9px 14px;border-radius:16px 16px 16px 4px;font-size:.82rem;color:#94a3b8}
+    @keyframes dots{0%,80%,100%{opacity:0}40%{opacity:1}}
+    .dot1{animation:dots 1.4s .0s infinite}.dot2{animation:dots 1.4s .2s infinite}.dot3{animation:dots 1.4s .4s infinite}
+    .chat-ctx{background:#0f172a;padding:5px 12px;font-size:.7rem;color:#475569;display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0}
+    .chat-input-row{background:#0f172a;padding:10px 12px;display:flex;align-items:center;gap:8px;border-top:1px solid #1e293b;flex-shrink:0}
+    #chat-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:8px 12px;font-size:.82rem;color:#f1f5f9;outline:none;resize:none;height:38px;font-family:inherit}
+    #chat-input:focus{border-color:#3b82f6}
+    .chat-btn{width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;transition:background .15s}
+    #mic-btn{background:#334155}
+    #mic-btn.listening{background:#ef4444}
+    #send-btn{background:#2563eb}
+    #send-btn:disabled{opacity:.4;cursor:not-allowed}
+    .chat-hint{text-align:center;font-size:.65rem;color:#334155;padding:4px 0 6px;flex-shrink:0}
+
+    /* ── Voice Mode ── */
+    #voice-fab{position:fixed;bottom:24px;right:90px;z-index:9999;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px #0006;transition:background .3s,box-shadow .3s;background:#475569;color:#fff}
+    #voice-fab.vm-wake{background:#0f766e}
+    #voice-fab.vm-active{background:#16a34a;animation:vm-ripple 1.3s ease-out infinite}
+    #voice-fab.vm-speaking{background:#7c3aed}
+    #voice-fab.vm-processing{background:#0f766e}
+    @keyframes vm-ripple{0%{box-shadow:0 0 0 0 rgba(22,163,74,.55),0 4px 20px #0006}70%{box-shadow:0 0 0 18px rgba(22,163,74,0),0 4px 20px #0006}100%{box-shadow:0 0 0 0 rgba(22,163,74,0),0 4px 20px #0006}}
+    #voice-bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:10000;background:#1e293b;border:1px solid #334155;border-radius:24px;padding:7px 18px;font-size:.8rem;color:#f1f5f9;display:none;align-items:center;gap:10px;box-shadow:0 4px 24px #0009;white-space:nowrap;max-width:90vw}
+    #voice-bar.show{display:flex}
+    .vb-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .vb-dot.green{background:#4ade80} .vb-dot.purple{background:#a78bfa} .vb-dot.teal{background:#2dd4bf} .vb-dot.gray{background:#64748b}
+    @keyframes vb-blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .vb-dot.blink{animation:vb-blink .85s infinite}
+    #vb-transcript{color:#94a3b8;max-width:220px;overflow:hidden;text-overflow:ellipsis;font-style:italic}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1 id="main-title">📚 AI 作业监督助手</h1>
+    <p id="api-status"><span class="dot-red">●</span> 后端未连接 — 请运行 python main.py</p>
+    <p id="cam-status" style="font-size:.8rem;color:#94a3b8;margin-top:2px;display:none"></p>
+  </div>
+  <div class="header-right">
+    <button id="lang-btn" class="btn" style="background:#475569; margin-right: 10px;">中文</button>
+    <input id="child-name" class="name-input" value="小明" placeholder="Child's Name"/>
+    <button id="main-btn" class="btn btn-start">开始学习</button>
+  </div>
+</div>
+
+<div id="summary-area"></div>
+
+<div class="grid">
+  <div class="card" id="status-card">
+    <div class="card-header">
+      <h2 id="child-title">— 的学习状态</h2>
+      <span id="state-badge" class="state-badge badge-IDLE">待机</span>
+    </div>
+    <div class="status-row">
+      <span id="focus-dot" class="indicator ind-gray"></span>
+      <span id="focus-text">未检测到人</span>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div id="stat-time" class="stat-val">00:00</div><div class="stat-lbl" id="lbl-phase">当前阶段</div></div>
+      <div class="stat-box"><div id="stat-round" class="stat-val">1</div><div class="stat-lbl" id="lbl-round">第几轮</div></div>
+      <div class="stat-box"><div id="stat-score" class="stat-val">0</div><div class="stat-lbl" id="lbl-score">专注分数</div></div>
+    </div>
+    <div id="last-event-row" class="last-event" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <h2 id="ev-log-title">事件记录 <span id="ev-count" style="font-weight:400;color:#64748b;font-size:.85rem"></span></h2>
+    <div id="timeline" class="timeline"><p class="empty-msg">暂无事件</p></div>
+  </div>
+
+  <div class="card">
+    <h2 id="focus-curve-title">本次专注曲线</h2>
+    <div class="chart-area" id="line-chart-wrap">
+      <p class="empty-msg">等待数据...</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="history-title">7天专注记录</h2>
+    <div class="chart-area" id="bar-chart-wrap">
+      <p class="empty-msg">暂无历史数据</p>
+    </div>
+  </div>
+</div>
+
+<div id="live-bar" class="live-bar" style="display:none"></div>
+
+<!-- ── Voice Mode FAB + Status Bar ── -->
+<button id="voice-fab" title="Voice Mode — speak hands-free to the AI">🎤</button>
+<div id="voice-bar">
+  <span class="vb-dot" id="vb-dot"></span>
+  <span id="vb-text">Listening...</span>
+  <span id="vb-transcript"></span>
+</div>
+
+<!-- ── Chat FAB + Panel ── -->
+<button id="chat-fab" title="Chat with Coach">💬</button>
+
+<div id="chat-panel">
+  <div class="chat-header">
+    <div class="chat-avatar">🤖</div>
+    <div>
+      <div class="chat-title">Coach AI</div>
+      <div class="chat-subtitle">● Online — deepseek-v4-flash</div>
+    </div>
+    <button id="chat-greet-btn">👋 Greet</button>
+  </div>
+  <div id="chat-messages"></div>
+  <div id="chat-ctx" class="chat-ctx" style="display:none"></div>
+  <div class="chat-input-row">
+    <button class="chat-btn" id="mic-btn" title="Hold to speak">🎤</button>
+    <input id="chat-input" placeholder="Type or hold 🎤 to speak..." />
+    <button class="chat-btn" id="send-btn" title="Send">➤</button>
+  </div>
+  <div style="text-align:center;padding:3px 0 6px;font-size:.65rem;color:#334155;flex-shrink:0">
+    HOLD 🎤 to speak, release to send &nbsp;·&nbsp; ⌨ type + Enter
+  </div>
+</div>
+
+<script>
+const BASE = 'http://127.0.0.1:8000';
+
+// ── i18n ──────────────────────────────────────────────────────────────────────
+let currentLang = 'en';
+const I18N = {
+  zh: {
+    mainTitle: '📚 AI 作业监督助手',
+    apiWait: '后端未连接 — 请运行 python main.py',
+    apiOk: '后端已连接 (localhost:8000)',
+    childName: '孩子姓名',
+    startLearning: '开始学习',
+    stopLearning: '停止学习',
+    studyStatus: ' 的学习状态',
+    noPerson: '未检测到人',
+    curPhase: '当前阶段',
+    round: '第几轮',
+    focusScore: '专注分数',
+    recentEvent: '最近事件: ',
+    evLog: '事件记录',
+    noEvents: '暂无事件',
+    focusCurve: '本次专注曲线',
+    waitData: '等待数据...',
+    historyTitle: '7天专注记录',
+    noHistory: '暂无历史数据',
+    minute: '分钟',
+    summaryTitle: '🎉 本次学习总结',
+    tomato: '番茄钟',
+    focusTime: '专注时长',
+    face: '脸部:',
+    phone: '手机:',
+    write: '书写:',
+    state: '状态:',
+    used: '已用:',
+    yes: '✅ 是',
+    no: '✅ 否',
+    phoneAlert: '🚨 检测到手机！',
+    distracted: '注意力分散',
+    focusing: '专心学习中',
+    stopFail: '停止失败: ',
+    startFail: '无法连接后端。请先运行: python main.py --api-only',
+    langBtn: 'English',
+    states: {IDLE:'待机',PREPARE:'准备中',FOCUS:'专注中',BREAK:'休息中',RESUME_CHECK:'继续确认',COMPLETE:'完成'},
+    events: {phone_detected:'手机使用',out_of_seat:'离开座位',distracted_gaze:'注意力分散',writing_idle:'停止书写',fatigue_drowsy:'疲劳',bad_posture_close:'距离过近',bad_posture_slouch:'坐姿不良',break_studying:'休息时学习',break_sedentary:'休息时久坐',good_focus:'优秀专注'},
+    pri: {'3':'高','2':'中','1':'低'}
+  },
+  en: {
+    mainTitle: '📚 AI Homework Supervisor',
+    apiWait: 'Backend disconnected — Please run python main.py',
+    apiOk: 'Backend connected (localhost:8000)',
+    childName: "Child's Name",
+    startLearning: 'Start Learning',
+    stopLearning: 'Stop Learning',
+    studyStatus: "'s Study Status",
+    noPerson: 'No person detected',
+    curPhase: 'Current Phase',
+    round: 'Round',
+    focusScore: 'Focus Score',
+    recentEvent: 'Recent Event: ',
+    evLog: 'Event Log',
+    noEvents: 'No events',
+    focusCurve: 'Focus Curve',
+    waitData: 'Waiting for data...',
+    historyTitle: '7-Day History',
+    noHistory: 'No history',
+    minute: 'Minutes',
+    summaryTitle: '🎉 Study Summary',
+    tomato: 'Pomodoro',
+    focusTime: 'Focus Time',
+    face: 'Face:',
+    phone: 'Phone:',
+    write: 'Write:',
+    state: 'State:',
+    used: 'Used:',
+    yes: '✅ Yes',
+    no: '✅ No',
+    phoneAlert: '🚨 Phone detected!',
+    distracted: 'Distracted',
+    focusing: 'Focusing',
+    stopFail: 'Stop failed: ',
+    startFail: 'Cannot connect to backend. Please run: python main.py --api-only',
+    langBtn: '中文',
+    states: {IDLE:'Idle',PREPARE:'Preparing',FOCUS:'Focusing',BREAK:'Break',RESUME_CHECK:'Resume Check',COMPLETE:'Complete'},
+    events: {phone_detected:'Phone Used',out_of_seat:'Out of Seat',distracted_gaze:'Distracted',writing_idle:'Stopped Writing',fatigue_drowsy:'Fatigue',bad_posture_close:'Too Close',bad_posture_slouch:'Slouching',break_studying:'Studying in Break',break_sedentary:'Sedentary in Break',good_focus:'Good Focus'},
+    pri: {'3':'High','2':'Med','1':'Low'}
+  }
+};
+
+function t(key, subkey) {
+  if (subkey) return I18N[currentLang][key][subkey] || subkey;
+  return I18N[currentLang][key] || key;
+}
+
+document.getElementById('lang-btn').addEventListener('click', async () => {
+  currentLang = currentLang === 'zh' ? 'en' : 'zh';
+  applyLang();
+  // Switch backend voice language
+  try {
+    await api('/session/language', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({lang: currentLang}),
+    });
+  } catch(e) { /* backend may not be running yet — UI still switches */ }
+  document.getElementById('main-title').textContent = t('mainTitle');
+  document.getElementById('child-name').placeholder = t('childName');
+  
+  // Refresh UI
+  updateBtn();
+  setApiStatus(apiOk);
+  document.getElementById('ev-log-title').childNodes[0].nodeValue = t('evLog') + ' ';
+  document.getElementById('focus-curve-title').textContent = t('focusCurve');
+  document.getElementById('history-title').textContent = t('historyTitle');
+  
+  // Re-render components with new language
+  const emptyMsgs = document.querySelectorAll('.empty-msg');
+  if (emptyMsgs[0] && emptyMsgs[0].textContent.includes('暂无') || emptyMsgs[0] && emptyMsgs[0].textContent.includes('No events')) {
+      emptyMsgs[0].textContent = t('noEvents');
+  }
+  if (emptyMsgs[1] && emptyMsgs[1].textContent.includes('等待') || emptyMsgs[1] && emptyMsgs[1].textContent.includes('Wait')) {
+      emptyMsgs[1].textContent = t('waitData');
+  }
+  if (emptyMsgs[2] && emptyMsgs[2].textContent.includes('暂无') || emptyMsgs[2] && emptyMsgs[2].textContent.includes('No hist')) {
+      emptyMsgs[2].textContent = t('noHistory');
+  }
+  
+  // Force a re-fetch to re-render dynamic content
+  fetchSession();
+});
+
+
+// ── State ────────────────────────────────────────────────────────────────────
+let apiOk = false, isActive = false, currentSessionId = null, loading = false;
+let evtSource = null;
+
+// ── Labels / maps ────────────────────────────────────────────────────────────
+const STATE_LABELS = I18N[currentLang].states;
+const EVENT_ICONS   = {phone_detected:'📱',out_of_seat:'🚶',distracted_gaze:'👀',writing_idle:'✏️',fatigue_drowsy:'😴',bad_posture_close:'📐',bad_posture_slouch:'🪑',break_studying:'📚',break_sedentary:'🧍',good_focus:'⭐'};
+const EVENT_LABELS = I18N[currentLang].events;
+const PRI_CLASS     = {'3':'ev-high','2':'ev-med','1':'ev-low'};
+const PRI_LABELS = I18N[currentLang].pri;
+
+// ── API ───────────────────────────────────────────────────────────────────────
+async function api(path, opts={}) {
+  const r = await fetch(BASE+path, opts);
+  if (!r.ok) throw new Error(r.statusText);
+  return r.json();
+}
+
+// ── Formatting ────────────────────────────────────────────────────────────────
+function fmt(sec) {
+  sec = sec||0;
+  return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
+}
+function fmtTime(ts) {
+  return new Date(ts).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function fmtDur(sec) {
+  sec = sec||0; const m=Math.floor(sec/60),s=sec%60;
+  if (currentLang === 'zh') return m>0?`${m}分${s}秒`:`${s}秒`;
+  return m>0?`${m}m ${s}s`:`${s}s`;
+}
+
+// ── Status card update ────────────────────────────────────────────────────────
+function updateStatusCard(session, live) {
+  const state = session?.pomodoro_state || 'IDLE';
+  document.getElementById('child-title').textContent = (session?.child_name||'—') + t('studyStatus');
+  const badge = document.getElementById('state-badge');
+  badge.textContent = t('states', state);
+  badge.className = 'state-badge badge-'+(I18N[currentLang].states[state]?state:'IDLE');
+
+  const dot = document.getElementById('focus-dot');
+  const txt = document.getElementById('focus-text');
+  dot.className = 'indicator';
+  if (!live) { dot.classList.add('ind-gray'); txt.textContent = t('noPerson'); }
+  else if (live.phone_detected) {
+    dot.classList.add('ind-red','pulsing'); txt.textContent = t('phoneAlert');
+  } else if (live.is_distracted||!live.face_present) {
+    dot.classList.add('ind-orange','pulsing'); txt.textContent = t('distracted');
+  } else {
+    dot.classList.add('ind-green','pulsing'); txt.textContent = t('focusing');
+  }
+
+  document.getElementById('stat-time').textContent  = fmt(session?.elapsed_seconds||live?.elapsed_seconds||0);
+  document.getElementById('stat-round').textContent = live?.round_number||session?.round_number||1;
+  document.getElementById('stat-score').textContent = Math.round(session?.focus_score_current||0);
+  document.getElementById('lbl-phase').textContent = t('curPhase');
+  document.getElementById('lbl-round').textContent = t('round');
+  document.getElementById('lbl-score').textContent = t('focusScore');
+
+  const evRow = document.getElementById('last-event-row');
+  if (session?.last_event) {
+    evRow.style.display='block';
+    evRow.textContent = t('recentEvent')+(t('events', session.last_event));
+  } else { evRow.style.display='none'; }
+}
+
+// ── Timeline ──────────────────────────────────────────────────────────────────
+function renderTimeline(events) {
+  const tl = document.getElementById('timeline');
+  document.getElementById('ev-count').textContent = events.length?`(${events.length})`:'';
+  if (!events.length) { tl.innerHTML=`<p class="empty-msg">${t('noEvents')}</p>`; return; }
+  const sorted = [...events].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+  tl.innerHTML = sorted.map(ev => {
+    const pk = String(ev.priority);
+    return `<div class="ev-item ${PRI_CLASS[pk]||'ev-low'}">
+      <span class="ev-icon">${EVENT_ICONS[ev.event_type]||'⚡'}</span>
+      <div>
+        <div class="ev-name">${t('events', ev.event_type)}<span class="ev-badge">[${t('pri', pk)}]</span></div>
+        <div class="ev-time">${fmtTime(ev.timestamp)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SVG Line Chart ────────────────────────────────────────────────────────────
+function renderLineChart(snapshots) {
+  const wrap = document.getElementById('line-chart-wrap');
+  if (!snapshots||!snapshots.length) { wrap.innerHTML=`<p class="empty-msg">${t('waitData')}</p>`; return; }
+  const W=560,H=160,PL=36,PR=10,PT=8,PB=24;
+  const cW=W-PL-PR, cH=H-PT-PB;
+  const xs = snapshots.map(s=>s.minute_mark);
+  const ys = snapshots.map(s=>Math.round(s.writing_score||0));
+  const xMin=Math.min(...xs),xMax=Math.max(...xs)||1;
+  const yMax=100;
+  const toX=v=>PL+((v-xMin)/(xMax-xMin||1))*cW;
+  const toY=v=>PT+cH-(v/yMax)*cH;
+  // grid lines
+  let grid='';
+  for(let y=0;y<=100;y+=25) {
+    const yp=toY(y);
+    grid+=`<line class="grid-line" x1="${PL}" y1="${yp}" x2="${W-PR}" y2="${yp}"/>`;
+    grid+=`<text class="axis" x="${PL-4}" y="${yp+4}" text-anchor="end">${y}</text>`;
+  }
+  // ref line at 50
+  grid+=`<line class="ref-line" x1="${PL}" y1="${toY(50)}" x2="${W-PR}" y2="${toY(50)}"/>`;
+  // x axis labels
+  let xLabels='';
+  xs.forEach((x,i)=>{ if(i%Math.max(1,Math.floor(xs.length/6))===0||i===xs.length-1)
+    xLabels+=`<text class="axis" x="${toX(x)}" y="${H-2}" text-anchor="middle">${x}</text>`;
+  });
+  // polyline
+  const pts=snapshots.map(s=>`${toX(s.minute_mark)},${toY(Math.round(s.writing_score||0))}`).join(' ');
+  wrap.innerHTML=`<svg class="chart" viewBox="0 0 ${W} ${H}">
+    ${grid}${xLabels}
+    <polyline points="${pts}" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
+    ${snapshots.map(s=>`<circle cx="${toX(s.minute_mark)}" cy="${toY(Math.round(s.writing_score||0))}" r="2.5" fill="#38bdf8"/>`).join('')}
+    <text class="axis" x="${W/2}" y="${H}" text-anchor="middle">${t('minute')}</text>
+  </svg>`;
+}
+
+// ── SVG Bar Chart ─────────────────────────────────────────────────────────────
+function renderBarChart(history) {
+  const wrap = document.getElementById('bar-chart-wrap');
+  if (!history||!history.length) { wrap.innerHTML=`<p class="empty-msg">${t('noHistory')}</p>`; return; }
+  const W=560,H=160,PL=36,PR=10,PT=8,PB=24;
+  const cW=W-PL-PR, cH=H-PT-PB;
+  const data = history.map(s=>({
+    date: new Date(s.started_at).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'}),
+    val: Math.round((s.total_focus_seconds||0)/60)
+  }));
+  const yMax=Math.max(...data.map(d=>d.val),1);
+  const barW=Math.max(8,cW/data.length*0.6);
+  const gap=cW/data.length;
+  // grid
+  let grid='';
+  for(let y=0;y<=yMax;y+=Math.ceil(yMax/4)) {
+    const yp=PT+cH-(y/yMax)*cH;
+    grid+=`<line class="grid-line" x1="${PL}" y1="${yp}" x2="${W-PR}" y2="${yp}"/>`;
+    grid+=`<text class="axis" x="${PL-4}" y="${yp+4}" text-anchor="end">${y}</text>`;
+  }
+  // bars + labels
+  const bars = data.map((d,i)=>{
+    const x=PL+gap*i+gap/2-barW/2;
+    const bH=(d.val/yMax)*cH;
+    const y=PT+cH-bH;
+    return `<rect x="${x}" y="${y}" width="${barW}" height="${bH}" fill="#818cf8" rx="3"/>
+      <text class="axis" x="${x+barW/2}" y="${H-2}" text-anchor="middle">${d.date}</text>`;
+  }).join('');
+  wrap.innerHTML=`<svg class="chart" viewBox="0 0 ${W} ${H}">${grid}${bars}</svg>`;
+}
+
+// ── Summary ───────────────────────────────────────────────────────────────────
+function renderSummary(s) {
+  if (!s) { document.getElementById('summary-area').innerHTML=''; return; }
+  const score=Math.round(s.focus_score_avg||0);
+  const sc=score>=80?'color:#4ade80':score>=50?'color:#fbbf24':'color:#f87171';
+  const counts=Object.entries(s.event_counts||{}).map(([k,v])=>
+    `<span class="ev-chip">${t('events', k)}: ${v}</span>`).join('');
+  document.getElementById('summary-area').innerHTML=`
+  <div class="summary-card">
+    <h2>${t('summaryTitle')}</h2>
+    <div class="sum-stats">
+      <div class="sum-box"><div class="stat-val">${s.rounds_completed||0}</div><div class="stat-lbl">${t('tomato')}</div></div>
+      <div class="sum-box"><div class="stat-val">${fmtDur(s.total_focus_seconds)}</div><div class="stat-lbl">${t('focusTime')}</div></div>
+      <div class="sum-box"><div class="stat-val" style="${sc}">${score}</div><div class="stat-lbl">${t('focusScore')}</div></div>
+    </div>
+    ${counts?`<div class="ev-counts">${counts}</div>`:''}
+    ${s.ai_summary?`<div class="ai-summary">${s.ai_summary}</div>`:''}
+  </div>`;
+}
+
+// ── Live bar ──────────────────────────────────────────────────────────────────
+function updateLiveBar(live) {
+  const bar = document.getElementById('live-bar');
+  if (!live) { bar.style.display='none'; return; }
+  bar.style.display='flex';
+  bar.innerHTML=`
+    <span><b>${t('face')}</b> ${live.face_present?'✅':'❌'}</span>
+    <span><b>${t('phone')}</b> ${live.phone_detected?t('yes'):t('no')}</span>
+    <span><b>${t('write')}</b> ${live.writing_score}</span>
+    <span><b>EAR:</b> ${live.ear_avg}</span>
+    <span><b>${t('state')}</b> ${t('states', live.pomodoro_state)}</span>
+    <span><b>${t('used')}</b> ${live.elapsed_seconds}s / ${live.round_number}</span>`;
+}
+
+// ── API status ────────────────────────────────────────────────────────────────
+function setApiStatus(ok) {
+  apiOk=ok;
+  document.getElementById('api-status').innerHTML = ok
+    ? '<span class="dot-green">●</span> ' + t('apiOk')
+    : '<span class="dot-red">●</span> ' + t('apiWait');
+}
+
+function setCamStatus(health) {
+  const el = document.getElementById('cam-status');
+  if (!health) { el.style.display='none'; return; }
+  el.style.display='block';
+  const camOk = health.camera_running;
+  const err = health.camera_error;
+  if (camOk) {
+    el.innerHTML = '<span class="dot-green">●</span> 摄像头正常 Camera OK';
+  } else if (err === 'cannot_open') {
+    el.innerHTML = '<span class="dot-red">●</span> ⚠️ 摄像头无法打开 — 请检查摄像头连接 / Camera cannot open — check connection or change CAMERA_INDEX in config.py';
+  } else if (err) {
+    el.innerHTML = `<span class="dot-red">●</span> ⚠️ 摄像头错误: ${err}`;
+  } else {
+    el.innerHTML = '<span style="color:#94a3b8">●</span> 摄像头未激活 Camera inactive — starts when session begins';
+  }
+}
+
+// ── Button state ──────────────────────────────────────────────────────────────
+function updateBtn() {
+  const btn = document.getElementById('main-btn');
+  const inp = document.getElementById('child-name');
+  if (loading) { btn.disabled=true; btn.textContent='...'; return; }
+  btn.disabled=false;
+  if (isActive) {
+    btn.textContent=t('stopLearning'); btn.className='btn btn-stop'; inp.style.display='none';
+  } else {
+    btn.textContent=t('startLearning'); btn.className='btn btn-start'; inp.style.display='';
+  }
+}
+
+// ── Fetch session ─────────────────────────────────────────────────────────────
+async function fetchSession() {
+  try {
+    const [s, health] = await Promise.all([
+      api('/session/current'),
+      api('/health').catch(()=>null),
+    ]);
+    setApiStatus(true);
+    setCamStatus(health);
+    const active = s?.pomodoro_state && !['IDLE','COMPLETE'].includes(s.pomodoro_state);
+    isActive=active; currentSessionId=s?.session_id||null;
+    updateStatusCard(s, null);
+    updateBtn();
+    if (s?.session_id) {
+      const [evs, snaps] = await Promise.all([
+        api(`/session/${s.session_id}/events`).catch(()=>[]),
+        api(`/session/${s.session_id}/snapshots`).catch(()=>[]),
+      ]);
+      renderTimeline(evs);
+      renderLineChart(snaps);
+    } else { renderTimeline([]); renderLineChart([]); }
+  } catch { setApiStatus(false); setCamStatus(null); updateBtn(); }
+}
+
+// ── SSE subscription ──────────────────────────────────────────────────────────
+function startSSE() {
+  if (evtSource) evtSource.close();
+  evtSource = new EventSource(BASE+'/stream/features');
+  evtSource.onmessage = e => {
+    try {
+      const live = JSON.parse(e.data);
+      updateLiveBar(live);
+      if (window._updateChatCtx) window._updateChatCtx(live);
+      // patch status card live data without full re-fetch
+      const state = live.pomodoro_state||'IDLE';
+      document.getElementById('stat-time').textContent  = fmt(live.elapsed_seconds||0);
+      document.getElementById('stat-round').textContent = live.round_number||1;
+      const dot = document.getElementById('focus-dot');
+      const txt = document.getElementById('focus-text');
+      dot.className='indicator';
+      if (live.phone_detected){ dot.classList.add('ind-red','pulsing');   txt.textContent=t('phoneAlert'); }
+      else if(live.is_distracted||!live.face_present){ dot.classList.add('ind-orange','pulsing'); txt.textContent=t('distracted'); }
+      else { dot.classList.add('ind-green','pulsing'); txt.textContent=t('focusing'); }
+    } catch{}
+  };
+  evtSource.onerror = () => {};
+}
+
+// ── Button handler ────────────────────────────────────────────────────────────
+document.getElementById('main-btn').addEventListener('click', async () => {
+  if (loading) return;
+  loading=true; updateBtn();
+  if (isActive) {
+    // STOP
+    try {
+      const s = await api('/session/stop',{method:'POST'});
+      renderSummary(s);
+      isActive=false; currentSessionId=null;
+      renderTimeline([]); renderLineChart([]);
+      updateStatusCard(null,null); updateLiveBar(null);
+      api('/history/1').then(renderBarChart).catch(()=>{});
+    } catch(e){ alert(t('stopFail')+e.message); }
+  } else {
+    // START
+    const name = document.getElementById('child-name').value||'小明';
+    try {
+      renderSummary(null);
+      const r = await api('/session/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({child_name:name,child_age:10})});
+      currentSessionId=r.session_id;
+      isActive=true;
+      startSSE();
+    } catch{ alert(t('startFail')); }
+  }
+  loading=false; updateBtn();
+});
+
+// ── Apply current language to all static UI elements ──────────────────────────
+function applyLang() {
+  document.getElementById('lang-btn').textContent      = t('langBtn');
+  document.getElementById('main-title').textContent    = t('mainTitle');
+  document.getElementById('child-name').placeholder    = t('childName');
+  updateBtn();
+}
+
+// ── Chat Panel ────────────────────────────────────────────────────────────────
+(function() {
+  const fab       = document.getElementById('chat-fab');
+  const panel     = document.getElementById('chat-panel');
+  const msgs      = document.getElementById('chat-messages');
+  const input     = document.getElementById('chat-input');
+  const sendBtn   = document.getElementById('send-btn');
+  const micBtn    = document.getElementById('mic-btn');
+  const greetBtn  = document.getElementById('chat-greet-btn');
+  const ctxBar    = document.getElementById('chat-ctx');
+
+  let chatOpen = false, chatLoading = false, recogn = null, listening = false;
+  let lastLive = null;
+
+  // Keep reference to latest live data for context bar
+  const _origSSE = window.addEventListener;
+  // Intercept live updates by patching updateLiveBar
+  const _origLiveBar = window.updateLiveBar;
+
+  // ── Open/close ──
+  fab.addEventListener('click', () => {
+    chatOpen = !chatOpen;
+    panel.classList.toggle('open', chatOpen);
+    fab.style.background = chatOpen ? '#ef4444' : '#3b82f6';
+    fab.textContent = chatOpen ? '✕' : '💬';
+    if (chatOpen && msgs.children.length === 0) addMsg('coach', "Hi! I'm your Coach 👋 Type a question or click 🎤 to speak!");
+    msgs.scrollTop = msgs.scrollHeight;
+  });
+
+  // Show greet button when session is active
+  function refreshGreetBtn() {
+    if (isActive) greetBtn.classList.add('show');
+    else greetBtn.classList.remove('show');
+  }
+  setInterval(refreshGreetBtn, 2000);
+
+  // ── Add message bubble ──
+  function addMsg(role, text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ' + role;
+    const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    wrap.innerHTML = `
+      ${role === 'coach' ? '<div class="msg-sender">Coach</div>' : ''}
+      <div class="msg-bubble">${text}</div>
+      <div class="msg-time">${now}</div>`;
+    msgs.appendChild(wrap);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showThinking() {
+    const el = document.createElement('div');
+    el.className = 'chat-thinking'; el.id = 'chat-thinking';
+    el.innerHTML = 'Coach is thinking<span class="dot1">.</span><span class="dot2">.</span><span class="dot3">.</span>';
+    msgs.appendChild(el);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+  function hideThinking() { document.getElementById('chat-thinking')?.remove(); }
+
+  // ── Send message ──
+  async function sendMessage(text) {
+    text = text.trim();
+    if (!text || chatLoading) return;
+    input.value = '';
+    addMsg('student', text);
+    chatLoading = true; sendBtn.disabled = true;
+    showThinking();
+    try {
+      const r = await fetch(BASE + '/chat', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({message: text})
+      });
+      const data = await r.json();
+      hideThinking();
+      addMsg('coach', data.reply || "Sorry, I couldn't get a response.");
+    } catch {
+      hideThinking();
+      addMsg('coach', "⚠️ Server not reachable. Is the backend running?");
+    }
+    chatLoading = false; sendBtn.disabled = false;
+  }
+
+  sendBtn.addEventListener('click', () => sendMessage(input.value));
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input.value); } });
+
+  // ── Greet button ──
+  greetBtn.addEventListener('click', async () => {
+    greetBtn.disabled = true;
+    try {
+      const r = await fetch(BASE + '/coach/greet', {method:'POST'});
+      const data = await r.json();
+      addMsg('coach', data.greeting || "Let's get started!");
+      if (!chatOpen) { chatOpen = true; panel.classList.add('open'); fab.style.background='#ef4444'; fab.textContent='✕'; }
+    } catch { addMsg('coach', "Let's do this! Focus time starts now 💪"); }
+    greetBtn.disabled = false;
+  });
+
+  // ── Push-to-talk voice input ──
+  // HOLD the mic button → speak → RELEASE → auto-sends
+  // Language auto-follows the dashboard lang switch (EN/ZH)
+  let finalTranscript = '';
+
+  function startRecording(e) {
+    e.preventDefault();
+    if (window._voiceModeActive) return; // hands-free mode is active
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('Voice input requires Chrome or Edge.'); return; }
+    if (listening) return;
+
+    recogn = new SR();
+    recogn.lang            = (currentLang === 'zh') ? 'zh-CN' : 'en-US';
+    recogn.continuous      = true;
+    recogn.interimResults  = true;
+    recogn.maxAlternatives = 1;
+    finalTranscript        = '';
+
+    recogn.onresult = ev => {
+      let interim = '';
+      finalTranscript = '';
+      for (let i = 0; i < ev.results.length; i++) {
+        if (ev.results[i].isFinal) finalTranscript += ev.results[i][0].transcript;
+        else interim += ev.results[i][0].transcript;
+      }
+      input.value = finalTranscript + interim;
+    };
+
+    recogn.onstart = () => {
+      listening = true;
+      micBtn.classList.add('listening');
+      micBtn.textContent = '⏹';
+      input.value = '';
+      input.placeholder = '🎤 Listening...';
+    };
+
+    recogn.onerror = ev => {
+      if (ev.error !== 'no-speech') console.warn('Speech error:', ev.error);
+    };
+
+    recogn.start();
+  }
+
+  function stopRecording(e) {
+    e.preventDefault();
+    if (!listening || !recogn) return;
+    recogn.stop();
+    listening = false;
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '🎤';
+    input.placeholder = 'Type or hold 🎤 to speak...';
+    // Send after a tiny delay to capture the last final result
+    setTimeout(() => {
+      const toSend = finalTranscript.trim() || input.value.trim();
+      if (toSend) { input.value = ''; sendMessage(toSend); }
+    }, 200);
+  }
+
+  // Mouse (desktop)
+  micBtn.addEventListener('mousedown',  startRecording);
+  micBtn.addEventListener('mouseup',    stopRecording);
+  micBtn.addEventListener('mouseleave', stopRecording);
+  // Touch (mobile)
+  micBtn.addEventListener('touchstart', startRecording, { passive: false });
+  micBtn.addEventListener('touchend',   stopRecording,  { passive: false });
+
+  // Expose addMsg so voice mode can post messages to chat panel
+  window._chatAddMsg = addMsg;
+
+  // ── Live context bar (updates from SSE) ──
+  const _sse = window.startSSE;
+  window._updateChatCtx = function(live) {
+    lastLive = live;
+    if (!live) { ctxBar.style.display='none'; return; }
+    ctxBar.style.display = 'flex';
+    const working = (live.work_confidence||0) >= 40;
+    ctxBar.innerHTML =
+      `<span>Work: ${live.work_confidence||'–'}</span>` +
+      `<span>Phase: ${live.pomodoro_state||'–'}</span>` +
+      `<span>${live.face_present ? '😊 Face':'❌ No face'}</span>` +
+      (live.phone_detected ? '<span style="color:#f87171">📱 Phone!</span>' : '') +
+      (working ? '<span style="color:#4ade80">✏️ Working</span>' : '');
+  };
+})();
+
+// ── Voice Mode — wake-word activated ────────────────────────────────────────
+// Student says "Coach" (EN) or "老师" (ZH) → AI wakes up → listens for message
+// While TTS plays → mic is fully paused → no feedback loop possible
+(function() {
+  const voiceBtn     = document.getElementById('voice-fab');
+  const voiceBar     = document.getElementById('voice-bar');
+  const vbDot        = document.getElementById('vb-dot');
+  const vbText       = document.getElementById('vb-text');
+  const vbTranscript = document.getElementById('vb-transcript');
+
+  // Wake words — must appear in the spoken phrase to activate
+  const WAKE_EN = ['coach', 'hey coach', 'ok coach', 'hi coach'];
+  const WAKE_ZH = ['老师', '嘿老师', '教练', '嘿教练'];
+
+  let vmActive    = false;  // voice mode on/off
+  let vmActivated = false;  // wake word heard, collecting message
+  let vmWaiting   = false;  // TTS playing — mic paused
+  let vmListening = false;
+  let vmSR        = null;
+  let vmAborted   = false;
+  let vmSendTimer = null;
+  let vmWakeTimeout = null; // reset if no message after wake word
+
+  window._voiceModeActive = false;
+
+  function wakeWords() { return currentLang === 'zh' ? WAKE_ZH : WAKE_EN; }
+
+  function wakeHint() {
+    return currentLang === 'zh'
+      ? "说「老师」来呼叫 AI"
+      : "Say 'Coach' to talk";
+  }
+
+  function setUI(state) {
+    voiceBtn.className = '';
+    voiceBar.classList.remove('show');
+    vbTranscript.textContent = '';
+    if (state === 'off') {
+      voiceBtn.textContent = '🎤';
+    } else if (state === 'wake') {
+      // Quietly waiting for wake word
+      voiceBtn.classList.add('vm-wake');
+      voiceBtn.textContent = '🎤';
+      vbDot.className = 'vb-dot gray';
+      vbText.textContent = wakeHint();
+      voiceBar.classList.add('show');
+    } else if (state === 'active') {
+      // Wake word heard — collecting message
+      voiceBtn.classList.add('vm-active');
+      voiceBtn.textContent = '👂';
+      vbDot.className = 'vb-dot green blink';
+      vbText.textContent = currentLang === 'zh' ? '我在听，说吧...' : "I'm listening...";
+      voiceBar.classList.add('show');
+    } else if (state === 'processing') {
+      voiceBtn.classList.add('vm-processing');
+      voiceBtn.textContent = '⏳';
+      vbDot.className = 'vb-dot teal blink';
+      vbText.textContent = currentLang === 'zh' ? 'AI 思考中...' : 'Coach thinking...';
+      voiceBar.classList.add('show');
+    } else if (state === 'speaking') {
+      voiceBtn.classList.add('vm-speaking');
+      voiceBtn.textContent = '🔊';
+      vbDot.className = 'vb-dot purple blink';
+      vbText.textContent = currentLang === 'zh' ? 'Coach 正在回答...' : 'Coach speaking...';
+      voiceBar.classList.add('show');
+    }
+  }
+
+  function startListening() {
+    if (!vmActive || vmWaiting) return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('Voice mode requires Chrome or Edge.'); return; }
+
+    vmSR = new SR();
+    vmSR.lang            = (currentLang === 'zh') ? 'zh-CN' : 'en-US';
+    vmSR.continuous      = true;   // never self-terminate on silence
+    vmSR.interimResults  = true;
+    vmSR.maxAlternatives = 1;
+    vmAborted   = false;
+    vmActivated = false;
+    clearTimeout(vmSendTimer);
+    clearTimeout(vmWakeTimeout);
+    let pending = '';
+
+    vmSR.onstart = () => { vmListening = true; setUI('wake'); };
+
+    vmSR.onresult = ev => {
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        const text   = ev.results[i][0].transcript;
+        const isFinal = ev.results[i].isFinal;
+        const lower  = text.toLowerCase();
+
+        if (!vmActivated) {
+          // ── Wake word scan ──
+          const found = wakeWords().find(w => lower.includes(w));
+          if (found) {
+            vmActivated = true;
+            pending = '';
+            clearTimeout(vmSendTimer);
+            clearTimeout(vmWakeTimeout);
+            // Grab any words spoken AFTER the wake word in the same phrase
+            const after = text.substring(lower.indexOf(found) + found.length).trim();
+            if (after) pending = after + ' ';
+            setUI('active');
+            vbTranscript.textContent = pending.trim();
+            // Safety: if student goes silent for 9s after wake word, reset
+            vmWakeTimeout = setTimeout(() => {
+              if (vmActivated && !pending.trim()) {
+                vmActivated = false;
+                setUI('wake');
+              }
+            }, 9000);
+            if (isFinal && pending.trim()) {
+              clearTimeout(vmSendTimer);
+              vmSendTimer = setTimeout(doSend, 900);
+            }
+          }
+        } else {
+          // ── Already activated — collect message ──
+          if (isFinal) {
+            pending += text + ' ';
+            clearTimeout(vmSendTimer);
+            clearTimeout(vmWakeTimeout);
+            vmSendTimer = setTimeout(doSend, 900);
+          } else {
+            vbTranscript.textContent = (pending + text).trim();
+          }
+          if (isFinal) vbTranscript.textContent = pending.trim();
+        }
+      }
+    };
+
+    function doSend() {
+      const msg = pending.trim();
+      pending = '';
+      vmActivated = false;
+      if (msg && vmActive && !vmWaiting) {
+        vmAborted = true;
+        try { vmSR.abort(); } catch(e) {}
+        handleVoiceInput(msg);
+      } else {
+        setUI('wake');
+      }
+    }
+
+    vmSR.onend = () => {
+      vmListening = false;
+      clearTimeout(vmSendTimer);
+      if (vmAborted || vmWaiting || !vmActive) return;
+      // Watchdog: browser killed the SR unexpectedly — restart
+      setTimeout(startListening, 300);
+    };
+
+    vmSR.onerror = ev => {
+      vmListening = false;
+      clearTimeout(vmSendTimer);
+      if (ev.error === 'aborted' || !vmActive) return;
+      const delay = ev.error === 'no-speech' ? 300 : 800;
+      setTimeout(startListening, delay);
+    };
+
+    try { vmSR.start(); } catch(e) {
+      console.warn('[VoiceMode] start failed:', e);
+      setTimeout(startListening, 1000);
+    }
+  }
+
+  async function handleVoiceInput(text) {
+    setUI('processing');
+    if (window._chatAddMsg) window._chatAddMsg('student', text);
+    try {
+      const r = await fetch(BASE + '/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: text})
+      });
+      const data = await r.json();
+      if (window._chatAddMsg && data.reply) window._chatAddMsg('coach', data.reply);
+    } catch(e) {
+      console.warn('[VoiceMode] /chat error:', e);
+    }
+    waitForTTS();
+  }
+
+  function waitForTTS() {
+    vmWaiting = true;
+    setUI('speaking');
+    setTimeout(pollTTS, 900);
+  }
+
+  async function pollTTS() {
+    if (!vmActive) { vmWaiting = false; setUI('off'); return; }
+    try {
+      const r = await fetch(BASE + '/tts/status');
+      const data = await r.json();
+      if (data.speaking) {
+        setTimeout(pollTTS, 600);
+      } else {
+        vmWaiting = false;
+        // Extra pause after TTS — let room echo die before listening for wake word again
+        setTimeout(startListening, 700);
+      }
+    } catch(e) {
+      vmWaiting = false;
+      setTimeout(startListening, 1000);
+    }
+  }
+
+  function stopVoiceMode() {
+    vmActive = false; vmWaiting = false; vmActivated = false;
+    window._voiceModeActive = false;
+    clearTimeout(vmSendTimer); clearTimeout(vmWakeTimeout);
+    if (vmSR) { vmAborted = true; try { vmSR.abort(); } catch(e) {} vmSR = null; }
+    vmListening = false;
+    setUI('off');
+  }
+
+  voiceBtn.addEventListener('click', () => {
+    if (vmActive) {
+      stopVoiceMode();
+    } else {
+      if (!isActive) {
+        alert(currentLang === 'zh'
+          ? '请先点击「开始学习」开启学习会话！'
+          : 'Please start a session first (click Start Learning)!');
+        return;
+      }
+      vmActive = true;
+      window._voiceModeActive = true;
+      startListening();
+    }
+  });
+})();
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+(async function init() {
+  applyLang();   // set UI to default language before first fetch
+  await fetchSession();
+  if (apiOk) {
+    startSSE();
+    api('/history/1').then(renderBarChart).catch(()=>{});
+  }
+  setInterval(fetchSession, 5000);
+})();
+</script>
+</body>
+</html>
