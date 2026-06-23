@@ -85,6 +85,13 @@ CALIB_MIN_SAMPLES        = 40      # Minimum good frames needed for calibration
 CALIB_EAR_PERCENTILE     = 30      # 30th percentile EAR to exclude blinks
 CALIB_EAR_FATIGUE_RATIO  = 0.55    # Personal fatigue threshold = baseline * ratio
 
+# ── InsightFace ArcFace identity (replaces geometric signature) ───────────────
+FACE_ID_ENABLED           = True    # Use InsightFace when available
+FACE_SIMILARITY_THRESHOLD = 0.35    # Cosine similarity >= this = same person
+                                    # ArcFace: same≈0.4–0.8, different≈0.1–0.3
+FACE_ENROLL_MIN_FRAMES    = 10      # Frames to collect during PREPARE before enrolling
+FACE_STRANGER_ALERT_SEC   = 3       # Stranger present this long = alert
+
 # ── Identity verification — "is this the SAME child who started?" ─────────────
 # During PREPARE the registered child's face-geometry signature is saved.
 # During FOCUS every face is compared; a different person triggers an alert.
@@ -146,11 +153,9 @@ CHILD_NAME = "小明"
 CHILD_AGE  = 10
 
 # ── LLM Coach (yunwu.ai — OpenAI-compatible) ──────────────────────────────────
-# Put your key in a .env file: LLM_API_KEY=sk-...
-import os as _os
 LLM_ENABLED        = True
 LLM_API_BASE       = "https://yunwu.ai/v1"
-LLM_API_KEY        = _os.environ.get("LLM_API_KEY", "")
+LLM_API_KEY        = "sk-zMbxAG2DyZMD3OR6RCSd81TMnq5hVauIHU973xWaoLR8Qney"
 LLM_MODEL          = "deepseek-v4-flash"
 LLM_FALLBACK_MODEL = "deepseek-chat"   # used when primary hits 429
 LLM_MAX_HISTORY    = 10    # conversation turns to remember

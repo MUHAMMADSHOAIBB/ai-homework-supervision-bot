@@ -6,8 +6,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from sse_starlette.sse import EventSourceResponse
 import config
 from api.schemas import (
@@ -20,7 +21,7 @@ app = FastAPI(title="AI Homework Supervision Bot API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -70,6 +71,8 @@ async def get_current_session():
         is_focused=(fv is not None and not fv.is_distracted and fv.face_present),
         last_event=last_event,
         focus_score_current=sm._compute_focus_score() if fv else 0.0,
+        person_count=fv.person_count if fv else 0,
+        stranger_present=fv.stranger_present if fv else False,
     )
 
 
@@ -214,6 +217,31 @@ async def coach_greet():
     return {"greeting": greeting}
 
 
+# ── Camera frame ─────────────────────────────────────────────────────────────
+
+@app.get("/camera/frame")
+async def camera_frame():
+    """Returns the latest camera frame as a JPEG image."""
+    sm = _get_sm()
+    try:
+        import cv2
+        # Prefer the annotated frame (face boxes + labels) over the raw frame
+        frame = getattr(sm, 'latest_annotated_frame', None)
+        if frame is None:
+            frame = sm.capture.get_frame() if sm.capture else None
+        if frame is None:
+            raise HTTPException(status_code=204, detail="No frame available")
+        # Resize to 480×270 for fast delivery (~15–20 KB per frame)
+        small = cv2.resize(frame, (480, 270), interpolation=cv2.INTER_LINEAR)
+        _, buf = cv2.imencode('.jpg', small, [cv2.IMWRITE_JPEG_QUALITY, 45])
+        return Response(content=buf.tobytes(), media_type='image/jpeg',
+                        headers={"Cache-Control": "no-store"})
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── TTS status ───────────────────────────────────────────────────────────────
 
 @app.get("/tts/status")
@@ -221,6 +249,17 @@ async def tts_status():
     """Returns whether the TTS engine is currently speaking. Used by voice mode."""
     sm = _get_sm()
     return {"speaking": sm.tts.is_speaking()}
+
+
+@app.get("/tts/latest")
+async def tts_latest():
+    """Serves the most recently generated TTS audio file."""
+    sm = _get_sm()
+    path = getattr(sm.tts, 'latest_path', None)
+    if path is None or not Path(str(path)).exists():
+        raise HTTPException(status_code=404, detail="No audio available")
+    return FileResponse(str(path), media_type='audio/mpeg',
+                        headers={"Cache-Control": "no-store"})
 
 
 # ── Health check ─────────────────────────────────────────────────────────────

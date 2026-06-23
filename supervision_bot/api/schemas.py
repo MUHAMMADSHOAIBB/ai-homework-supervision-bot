@@ -12,6 +12,8 @@ class SessionStatus(BaseModel):
     is_focused: bool
     last_event: str | None
     focus_score_current: float
+    person_count: int = 0
+    stranger_present: bool = False
 
 
 class EventOut(BaseModel):

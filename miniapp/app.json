@@ -1,0 +1,28 @@
+{
+  "pages": [
+    "pages/child/child",
+    "pages/parent/parent",
+    "pages/records/records",
+    "pages/profile/profile"
+  ],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#52c41a",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/child/child",   "text": "专注" },
+      { "pagePath": "pages/records/records", "text": "记录" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "监督 Bot",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f9f5",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

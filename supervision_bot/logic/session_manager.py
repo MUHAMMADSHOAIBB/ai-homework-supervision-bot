@@ -11,6 +11,7 @@ from vision.capture import CameraCapture
 from vision.mediapipe_module import MediaPipeModule
 from vision.yolo_module import YoloModule
 from vision.optical_flow import OpticalFlowModule
+from vision.face_id import FaceIdentifier
 from vision.feature_aggregator import FeatureAggregator, FeatureVector, CalibrationProfile
 from logic.state_machine import PomodoroMachine
 from logic.rules_engine import RulesEngine, Event, EventType
@@ -61,6 +62,11 @@ class SessionManager:
             self.mp_module   = MediaPipeModule()
             self.yolo_module = YoloModule()
             self.flow_module = OpticalFlowModule()
+            self.face_id     = FaceIdentifier() if config.FACE_ID_ENABLED else None
+        else:
+            self.face_id     = None
+
+        self.latest_annotated_frame = None  # served by /camera/frame endpoint
 
         self.aggregator = FeatureAggregator()
         self.pomodoro   = PomodoroMachine(on_state_change=self._on_state_change)
@@ -119,7 +125,52 @@ class SessionManager:
         face, pose, hand = self.mp_module.process(frame)
         yolo             = self.yolo_module.process(frame)
         flow_score       = self.flow_module.process(frame)
-        self.aggregator.update(face, pose, yolo, flow_score, hand)
+
+        # ── ArcFace multi-person identification ──────────────────────────────
+        face_id_result = None
+        if self.face_id is not None and self.face_id.available:
+            if self.pomodoro.current_state == "PREPARE":
+                self.face_id.enroll_frame(frame)
+            face_id_result = self.face_id.identify(frame)
+
+        self.aggregator.update(face, pose, yolo, flow_score, hand, face_id_result)
+
+        # ── Build annotated frame (always, for /camera/frame endpoint) ───────
+        # Layer 1: MediaPipe — head pose, EAR, hand skeleton, pen grip
+        ann = self.mp_module.draw_debug(frame, face, pose, hand)
+        # Layer 2: YOLO — phone box, person box, desk scan zone
+        ann = self.yolo_module.draw_debug(ann, yolo)
+        # Layer 3: FaceID — colored identity boxes (CHILD / STRANGER)
+        if face_id_result is not None and self.face_id is not None:
+            ann = self.face_id.draw(ann, face_id_result)
+
+        fv = self.aggregator.get_latest()
+        if fv is not None:
+            working = fv.work_confidence >= config.WORK_CONFIDENCE_THRESHOLD
+            col   = (0, 200, 0) if working else (0, 165, 255)
+            label = "WORKING" if working else "idle"
+            cv2.putText(ann, f"Work:{fv.work_confidence:.0f} [{label}]", (10, 130),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, col, 2)
+            if fv.identity_known:
+                id_col = (0, 0, 255) if fv.face_mismatch else (0, 255, 0)
+                id_lbl = "STRANGER!" if fv.stranger_present else \
+                         ("DIFFERENT!" if fv.face_mismatch else "CHILD OK")
+                cv2.putText(ann, f"ID: {id_lbl}  people:{fv.person_count}", (10, 155),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, id_col, 2)
+            if fv.face_present:
+                live_col = (0, 0, 255) if fv.face_static else (0, 255, 0)
+                live_lbl = "STATIC/PHOTO?" if fv.face_static else "LIVE"
+                talk = " TALKING" if fv.is_talking else ""
+                cv2.putText(ann, f"[{live_lbl}]{talk}  MAR:{fv.mar:.2f}", (10, 180),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, live_col, 2)
+            # Pomodoro state top-right
+            h_ann, w_ann = ann.shape[:2]
+            state_lbl = f"Bot: {self.pomodoro.current_state}"
+            cv2.putText(ann, state_lbl,
+                        (w_ann - 220, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
+                        (0, 165, 255), 2)
+
+        self.latest_annotated_frame = ann
 
         # Collect calibration samples during PREPARE
         if (config.CALIBRATE_DURING_PREPARE
@@ -129,36 +180,15 @@ class SessionManager:
             self._calib_ear.append(face.ear_avg)
             self._calib_yaw.append(face.head_yaw)
             self._calib_pitch.append(face.head_pitch)
-            # Collect identity signatures (only frontal frames produce one)
             if config.IDENTITY_VERIFY and face.signature is not None:
                 self._calib_sig.append(face.signature)
 
         if self._debug:
-            debug_frame = self.mp_module.draw_debug(frame, face, pose, hand)
-            debug_frame = self.yolo_module.draw_debug(debug_frame, yolo)
-            fv = self.aggregator.get_latest()
-            if fv is not None:
-                working = fv.work_confidence >= config.WORK_CONFIDENCE_THRESHOLD
-                col = (0, 255, 0) if working else (0, 165, 255)
-                label = "WORKING" if working else "idle"
-                cv2.putText(debug_frame,
-                            f"Work:{fv.work_confidence:.0f} [{label}]", (10, 130),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, col, 2)
-                if fv.identity_known:
-                    id_col = (0, 0, 255) if fv.face_mismatch else (0, 255, 0)
-                    id_lbl = "DIFFERENT!" if fv.face_mismatch else "match"
-                    cv2.putText(debug_frame,
-                                f"ID dist:{fv.identity_distance:.3f} [{id_lbl}]", (10, 155),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, id_col, 2)
-                if fv.face_present:
-                    live_col = (0, 0, 255) if fv.face_static else (0, 255, 0)
-                    live_lbl = "STATIC/PHOTO?" if fv.face_static else "LIVE"
-                    talk = " TALKING" if fv.is_talking else ""
-                    cv2.putText(debug_frame,
-                                f"[{live_lbl}]{talk} MAR:{fv.mar:.2f}", (10, 180),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, live_col, 2)
-            self.expression.update_debug_frame(debug_frame)
-            cv2.imshow("Supervision Bot — Debug", debug_frame)
+            try:
+                self.expression.update_debug_frame(ann)
+            except Exception:
+                pass
+            cv2.imshow("Supervision Bot — Debug", ann)
             cv2.waitKey(1)
 
     async def _tick_logic(self) -> None:
@@ -185,9 +215,11 @@ class SessionManager:
             pass
 
     def _on_state_change(self, old: str, new: str) -> None:
-        # When PREPARE ends → FOCUS begins: finalize calibration
+        # When PREPARE ends → FOCUS begins: finalize calibration + enroll face
         if old == "PREPARE" and new == "FOCUS":
             self._finalize_calibration()
+            if self.face_id is not None:
+                self.face_id.finalize_enrollment()
 
         import config as cfg
         announcement_map = {
@@ -335,6 +367,8 @@ class SessionManager:
         self.aggregator.reset()
         if self.flow_module:
             self.flow_module.reset()
+        if self.face_id:
+            self.face_id.reset()
         self._last_snapshot_min = -1
         # Reset calibration for new session
         self._calib_ear.clear()

@@ -30,6 +30,7 @@ class TTSEngine:
     def __init__(self):
         self.cache_dir = Path(config.TTS_CACHE_DIR)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+        self.latest_path: Path | None = None
 
     async def speak(self, text: str) -> None:
         if not text:
@@ -100,5 +101,6 @@ class TTSEngine:
         try:
             pygame.mixer.music.load(str(path))
             pygame.mixer.music.play()
+            self.latest_path = path
         except Exception:
             pass

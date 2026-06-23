@@ -168,23 +168,29 @@ class RulesEngine:
     def _check_identity(self, fv: FeatureVector) -> Event | None:
         """Alert if the face on camera is NOT the child who started the session."""
         now = time.monotonic()
-        if not config.IDENTITY_VERIFY or not fv.identity_known:
+        if not config.IDENTITY_VERIFY and not fv.stranger_present:
             self._identity_bad_since = None
             return None
-        # Only judge when a frontal face is actually being compared
-        if not fv.face_present or fv.identity_distance <= 0.0:
-            self._identity_bad_since = None
-            return None
-        if fv.face_mismatch:
+
+        # ArcFace path: stranger_present fires faster (3s)
+        triggered = fv.stranger_present or (
+            fv.identity_known and fv.face_present
+            and fv.identity_distance > 0.0 and fv.face_mismatch
+        )
+        if triggered:
             if self._identity_bad_since is None:
                 self._identity_bad_since = now
             dur = now - self._identity_bad_since
-            if dur >= config.IDENTITY_ALERT_SECONDS:
+            # ArcFace uses faster threshold; geometric uses IDENTITY_ALERT_SECONDS
+            threshold = config.FACE_STRANGER_ALERT_SEC if fv.stranger_present \
+                        else config.IDENTITY_ALERT_SECONDS
+            if dur >= threshold:
                 return Event(
                     event_type=EventType.UNKNOWN_PERSON,
                     priority=Priority.HIGH,
                     message_intent="unknown_person_high",
-                    context={"distance": round(fv.identity_distance, 3)},
+                    context={"distance": round(fv.identity_distance, 3),
+                             "person_count": fv.person_count},
                     timestamp=datetime.utcnow(),
                 )
         else:

@@ -53,6 +53,9 @@ class FeatureVector:
     identity_known: bool     = False   # a registered face exists for this session
     identity_distance: float = 0.0     # signature distance from registered child
     face_mismatch: bool      = False   # current face differs from registered child
+    # Multi-person / ArcFace
+    person_count: int        = 0       # total faces detected in frame
+    stranger_present: bool   = False   # non-child face present (ArcFace result)
     # Mouth / talking
     mar: float               = 0.0     # mouth aspect ratio
     is_talking: bool         = False   # mouth moving repeatedly = talking
@@ -124,7 +127,8 @@ class FeatureAggregator:
               flush=True)
 
     def update(self, face: FaceResult, pose: PoseResult, yolo: YoloResult,
-               flow_score: float, hand: HandResult) -> FeatureVector:
+               flow_score: float, hand: HandResult,
+               face_id_result=None) -> FeatureVector:
         now = time.monotonic()
 
         # Rolling buffers
@@ -301,6 +305,18 @@ class FeatureAggregator:
             self._live_pitch_buf.clear()
             self._live_mar_buf.clear()
 
+        # ── ArcFace multi-person results ──────────────────────────────────────
+        arc_person_count  = 0
+        arc_stranger      = False
+        # ArcFace overrides geometric identity check when available
+        if face_id_result is not None:
+            arc_person_count = face_id_result.person_count
+            arc_stranger     = face_id_result.stranger_present
+            if face_id_result.faces:
+                # Use ArcFace result for identity_known / face_mismatch
+                identity_known    = face_id_result.is_enrolled if hasattr(face_id_result, 'is_enrolled') else identity_known
+                face_mismatch     = arc_stranger or face_mismatch
+
         fv = FeatureVector(
             timestamp=datetime.utcnow(),
             face_present=face.detected,
@@ -327,6 +343,8 @@ class FeatureAggregator:
             is_talking=is_talking,
             is_live=is_live,
             face_static=face_static,
+            person_count=arc_person_count,
+            stranger_present=arc_stranger,
         )
         self._latest = fv
         return fv
