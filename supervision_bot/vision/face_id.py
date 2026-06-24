@@ -62,6 +62,10 @@ class FaceIdentifier:
         self._enroll_buf: list[np.ndarray] = []      # collected during PREPARE
         self._threshold = config.FACE_SIMILARITY_THRESHOLD
         self._initialized = False
+        # Throttle: run ArcFace max N times/sec (heavy on CPU)
+        self._last_identify_time: float = 0.0
+        self._last_enroll_time:   float = 0.0
+        self._last_result: FaceIDResult = FaceIDResult()
         self._init()
 
     def _init(self) -> None:
@@ -93,6 +97,12 @@ class FaceIdentifier:
         """
         if not self._initialized or self._app is None:
             return 0
+        import time
+        now = time.monotonic()
+        # Enroll at most 2 frames/sec — no need to run faster
+        if now - self._last_enroll_time < 0.5:
+            return len(self._enroll_buf)
+        self._last_enroll_time = now
         try:
             faces = self._app.get(frame)
         except Exception:
@@ -127,15 +137,22 @@ class FaceIdentifier:
     # ── Per-frame identification ──────────────────────────────────────────────
 
     def identify(self, frame: np.ndarray) -> FaceIDResult:
-        """Run on every frame. Returns all detected faces with identity labels."""
+        """Run at most 2×/sec. Returns cached result between runs."""
         if not self._initialized or self._app is None:
-            return FaceIDResult()
+            return self._last_result
+        import time
+        now = time.monotonic()
+        # Run ArcFace max 2 times per second — it's heavy on CPU
+        if now - self._last_identify_time < 0.5:
+            return self._last_result
+        self._last_identify_time = now
         try:
             raw_faces = self._app.get(frame)
         except Exception:
-            return FaceIDResult()
+            return self._last_result
         if not raw_faces:
-            return FaceIDResult()
+            self._last_result = FaceIDResult()
+            return self._last_result
 
         persons: list[PersonDetection] = []
         child_present = False
@@ -172,12 +189,13 @@ class FaceIdentifier:
         # Sort largest face first
         persons.sort(key=lambda p: _bbox_area(p.bbox), reverse=True)
 
-        return FaceIDResult(
+        self._last_result = FaceIDResult(
             faces=persons,
             person_count=len(persons),
             child_present=child_present,
             stranger_present=stranger_present,
         )
+        return self._last_result
 
     # ── Annotated frame for live view ─────────────────────────────────────────
 

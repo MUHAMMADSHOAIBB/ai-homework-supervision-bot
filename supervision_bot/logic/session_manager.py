@@ -83,6 +83,7 @@ class SessionManager:
         self._child_name   = config.CHILD_NAME
         self._frame_count  = 0
         self._last_tick_time: float  = 0.0
+        self._last_annotate_time: float = 0.0
         self._last_snapshot_min: int = -1
         self._tts_queue: asyncio.Queue = asyncio.Queue()
 
@@ -130,47 +131,48 @@ class SessionManager:
         face_id_result = None
         if self.face_id is not None and self.face_id.available:
             if self.pomodoro.current_state == "PREPARE":
+                # Enroll only — no identity check needed during setup
                 self.face_id.enroll_frame(frame)
-            face_id_result = self.face_id.identify(frame)
+            else:
+                # Throttled to 2×/sec inside identify()
+                face_id_result = self.face_id.identify(frame)
 
         self.aggregator.update(face, pose, yolo, flow_score, hand, face_id_result)
 
-        # ── Build annotated frame (always, for /camera/frame endpoint) ───────
-        # Layer 1: MediaPipe — head pose, EAR, hand skeleton, pen grip
-        ann = self.mp_module.draw_debug(frame, face, pose, hand)
-        # Layer 2: YOLO — phone box, person box, desk scan zone
-        ann = self.yolo_module.draw_debug(ann, yolo)
-        # Layer 3: FaceID — colored identity boxes (CHILD / STRANGER)
-        if face_id_result is not None and self.face_id is not None:
-            ann = self.face_id.draw(ann, face_id_result)
+        # ── Build annotated frame (throttled to 8×/sec — drawing is CPU work) ─
+        now_ann = time.monotonic()
+        if now_ann - self._last_annotate_time >= 0.125:
+            self._last_annotate_time = now_ann
+            ann = self.mp_module.draw_debug(frame, face, pose, hand)
+            ann = self.yolo_module.draw_debug(ann, yolo)
+            if face_id_result is not None and self.face_id is not None:
+                ann = self.face_id.draw(ann, face_id_result)
 
-        fv = self.aggregator.get_latest()
-        if fv is not None:
-            working = fv.work_confidence >= config.WORK_CONFIDENCE_THRESHOLD
-            col   = (0, 200, 0) if working else (0, 165, 255)
-            label = "WORKING" if working else "idle"
-            cv2.putText(ann, f"Work:{fv.work_confidence:.0f} [{label}]", (10, 130),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, col, 2)
-            if fv.identity_known:
-                id_col = (0, 0, 255) if fv.face_mismatch else (0, 255, 0)
-                id_lbl = "STRANGER!" if fv.stranger_present else \
-                         ("DIFFERENT!" if fv.face_mismatch else "CHILD OK")
-                cv2.putText(ann, f"ID: {id_lbl}  people:{fv.person_count}", (10, 155),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, id_col, 2)
-            if fv.face_present:
-                live_col = (0, 0, 255) if fv.face_static else (0, 255, 0)
-                live_lbl = "STATIC/PHOTO?" if fv.face_static else "LIVE"
-                talk = " TALKING" if fv.is_talking else ""
-                cv2.putText(ann, f"[{live_lbl}]{talk}  MAR:{fv.mar:.2f}", (10, 180),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, live_col, 2)
-            # Pomodoro state top-right
-            h_ann, w_ann = ann.shape[:2]
-            state_lbl = f"Bot: {self.pomodoro.current_state}"
-            cv2.putText(ann, state_lbl,
-                        (w_ann - 220, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
-                        (0, 165, 255), 2)
+            fv = self.aggregator.get_latest()
+            if fv is not None:
+                working = fv.work_confidence >= config.WORK_CONFIDENCE_THRESHOLD
+                col   = (0, 200, 0) if working else (0, 165, 255)
+                label = "WORKING" if working else "idle"
+                cv2.putText(ann, f"Work:{fv.work_confidence:.0f} [{label}]", (10, 130),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, col, 2)
+                if fv.identity_known:
+                    id_col = (0, 0, 255) if fv.face_mismatch else (0, 255, 0)
+                    id_lbl = "STRANGER!" if fv.stranger_present else \
+                             ("DIFFERENT!" if fv.face_mismatch else "CHILD OK")
+                    cv2.putText(ann, f"ID: {id_lbl}  people:{fv.person_count}", (10, 155),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, id_col, 2)
+                if fv.face_present:
+                    live_col = (0, 0, 255) if fv.face_static else (0, 255, 0)
+                    live_lbl = "STATIC/PHOTO?" if fv.face_static else "LIVE"
+                    talk = " TALKING" if fv.is_talking else ""
+                    cv2.putText(ann, f"[{live_lbl}]{talk}  MAR:{fv.mar:.2f}", (10, 180),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, live_col, 2)
+                h_ann, w_ann = ann.shape[:2]
+                cv2.putText(ann, f"Bot: {self.pomodoro.current_state}",
+                            (w_ann - 220, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
+                            (0, 165, 255), 2)
 
-        self.latest_annotated_frame = ann
+            self.latest_annotated_frame = ann
 
         # Collect calibration samples during PREPARE
         if (config.CALIBRATE_DURING_PREPARE
