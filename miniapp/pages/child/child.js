@@ -347,18 +347,16 @@ Page({
       const res = await api.chat(text)
       const reply = res.reply || '...'
       const aid = ++this._msgId
-      const updated = this.data.chatMessages
-      updated.push({ id: aid, role: 'ai', text: reply })
+      const updated = [...this.data.chatMessages, { id: aid, role: 'ai', text: reply }]
       this.setData({
         chatMessages: updated,
         chatLoading: false,
         aiMessage: reply,
         scrollId: 'msg' + aid,
       })
-      this._speakText(reply)
+      try { this._speakText(reply) } catch(e) {}
     } catch (e) {
-      const updated = this.data.chatMessages
-      updated.push({ id: Date.now(), role: 'ai', text: t('connectFail') })
+      const updated = [...this.data.chatMessages, { id: ++this._msgId, role: 'ai', text: t('connectFail') }]
       this.setData({ chatMessages: updated, chatLoading: false })
     }
   },
