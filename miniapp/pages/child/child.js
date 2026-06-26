@@ -53,6 +53,7 @@ Page({
   _lastEventId: '',
   _audioCtx: null,
   _lastSpokenAlert: '',
+  _msgId: 0,
 
   onLoad() {
     const app = getApp()
@@ -319,7 +320,7 @@ Page({
     if (!text || this.data.chatLoading) return
 
     const msgs = this.data.chatMessages
-    const uid  = Date.now()
+    const uid  = ++this._msgId
     msgs.push({ id: uid, role: 'user', text })
     this.setData({
       chatMessages: msgs,
@@ -331,7 +332,7 @@ Page({
     try {
       const res = await api.chat(text)
       const reply = res.reply || '...'
-      const aid = Date.now()
+      const aid = ++this._msgId
       const updated = this.data.chatMessages
       updated.push({ id: aid, role: 'ai', text: reply })
       this.setData({
