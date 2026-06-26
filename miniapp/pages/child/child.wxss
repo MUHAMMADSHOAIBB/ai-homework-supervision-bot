@@ -60,8 +60,16 @@
   background: #fff; border-radius: 20rpx; border-bottom-left-radius: 4rpx;
   padding: 18rpx 20rpx; flex: 1;
   box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.08);
+  position: relative;
 }
 .speech-text { font-size: 26rpx; color: #595959; line-height: 1.6; }
+.speak-stop {
+  position: absolute; top: 10rpx; right: 10rpx;
+  width: 44rpx; height: 44rpx; border-radius: 50%;
+  background: rgba(255,77,79,0.12);
+  display: flex; align-items: center; justify-content: center;
+}
+.speak-stop-icon { font-size: 22rpx; color: #ff4d4f; }
 
 /* ── Timer card ── */
 .timer-card {

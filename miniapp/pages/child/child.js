@@ -43,6 +43,7 @@ Page({
     scrollId: '',
     i_chatTitle: '和 AI 聊聊',
     i_chatPlaceholder: '问问 AI 老师…',
+    isSpeaking: false,
   },
 
   _pollTimer: null,
@@ -82,6 +83,10 @@ Page({
 
   _speakText(text) {
     if (!text) return
+    // Stop anything currently playing before starting new TTS
+    if (this._audioCtx) {
+      try { this._audioCtx.stop() } catch(e) {}
+    }
     const lang = getApp().globalData.lang === 'zh' ? 'zh_CN' : 'en_US'
     wx.textToSpeech({
       lang,
@@ -92,10 +97,21 @@ Page({
           this._audioCtx = wx.createInnerAudioContext()
         }
         this._audioCtx.src = res.filePath
+        this._audioCtx.onPlay(() => this.setData({ isSpeaking: true }))
+        this._audioCtx.onEnded(() => this.setData({ isSpeaking: false }))
+        this._audioCtx.onError(() => this.setData({ isSpeaking: false }))
+        this._audioCtx.onStop(() => this.setData({ isSpeaking: false }))
         this._audioCtx.play()
       },
       fail: () => {},
     })
+  },
+
+  stopSpeak() {
+    if (this._audioCtx) {
+      try { this._audioCtx.stop() } catch(e) {}
+    }
+    this.setData({ isSpeaking: false })
   },
 
   _applyLang() {

@@ -31,6 +31,9 @@
     </view>
     <view class="speech-bubble">
       <text class="speech-text">{{aiMessage}}</text>
+      <view class="speak-stop" wx:if="{{isSpeaking}}" bindtap="stopSpeak">
+        <text class="speak-stop-icon">⏹</text>
+      </view>
     </view>
   </view>
 
