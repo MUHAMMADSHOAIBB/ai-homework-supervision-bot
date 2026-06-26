@@ -246,9 +246,30 @@ async def camera_frame():
 
 @app.get("/tts/status")
 async def tts_status():
-    """Returns whether the TTS engine is currently speaking. Used by voice mode."""
     sm = _get_sm()
-    return {"speaking": sm.tts.is_speaking()}
+    return {"speaking": sm.tts.is_speaking(), "muted": sm.tts.muted}
+
+
+@app.post("/tts/stop")
+async def tts_stop():
+    sm = _get_sm()
+    sm.tts.stop()
+    return {"ok": True}
+
+
+@app.post("/tts/mute")
+async def tts_mute():
+    sm = _get_sm()
+    sm.tts.muted = True
+    sm.tts.stop()
+    return {"muted": True}
+
+
+@app.post("/tts/unmute")
+async def tts_unmute():
+    sm = _get_sm()
+    sm.tts.muted = False
+    return {"muted": False}
 
 
 @app.get("/tts/latest")

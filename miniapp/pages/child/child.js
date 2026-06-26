@@ -35,6 +35,7 @@ Page({
     i_btnText:      '开始学习',
     i_offline:      '',
     i_goal:         '目标 25 分钟',
+    laptopMuted: false,
     // Chat panel
     showChat: false,
     chatMessages: [],
@@ -202,6 +203,7 @@ Page({
       if (active && session.session_id) {
         this._loadLatestAlert(session.session_id)
       }
+      api.ttsStatus().then(s => this.setData({ laptopMuted: !!s.muted })).catch(() => {})
     } catch (e) {
       this.setData({ connected: false })
     }
@@ -298,6 +300,18 @@ Page({
   },
 
   dismissAlert() { this.setData({ showAlert: false, currentAlert: '' }) },
+
+  async toggleLaptopMute() {
+    try {
+      if (this.data.laptopMuted) {
+        await api.ttsUnmute()
+        this.setData({ laptopMuted: false })
+      } else {
+        await api.ttsMute()
+        this.setData({ laptopMuted: true })
+      }
+    } catch (e) {}
+  },
 
   goToParent() { wx.navigateTo({ url: '/pages/parent/parent' }) },
 

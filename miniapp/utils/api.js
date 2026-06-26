@@ -27,6 +27,9 @@ module.exports = {
   chat:         (msg)        => request('/chat',             { method: 'POST', data: { message: msg } }),
   greet:        ()           => request('/coach/greet',      { method: 'POST' }),
   ttsStatus:    ()           => request('/tts/status'),
+  ttsStop:      ()           => request('/tts/stop',   { method: 'POST' }),
+  ttsMute:      ()           => request('/tts/mute',   { method: 'POST' }),
+  ttsUnmute:    ()           => request('/tts/unmute', { method: 'POST' }),
   setLanguage:  (lang)       => request('/session/language', { method: 'POST', data: { lang } }),
   // Returns URL string (not a fetch) — append to <image src>
   cameraFrameUrl: () => app.globalData.baseUrl + '/camera/frame?t=' + Date.now(),

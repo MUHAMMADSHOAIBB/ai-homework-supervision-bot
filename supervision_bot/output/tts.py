@@ -31,9 +31,10 @@ class TTSEngine:
         self.cache_dir = Path(config.TTS_CACHE_DIR)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.latest_path: Path | None = None
+        self.muted: bool = False
 
     async def speak(self, text: str) -> None:
-        if not text:
+        if not text or self.muted:
             return
         # Skip if audio is still playing
         if _PYGAME_OK and pygame.mixer.music.get_busy():

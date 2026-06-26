@@ -6,8 +6,14 @@
       <text class="header-logo">🌱</text>
       <text class="header-title">监督 Bot</text>
     </view>
-    <view class="parent-btn" bindtap="goToParent">
-      <text>{{i_parentBtn}}</text>
+    <view class="header-right">
+      <view class="mute-btn {{laptopMuted ? 'mute-btn-on' : ''}}" bindtap="toggleLaptopMute">
+        <text class="mute-icon">{{laptopMuted ? '🔇' : '🔊'}}</text>
+        <text class="mute-lbl">{{laptopMuted ? 'Muted' : 'PC Voice'}}</text>
+      </view>
+      <view class="parent-btn" bindtap="goToParent">
+        <text>{{i_parentBtn}}</text>
+      </view>
     </view>
   </view>
 
