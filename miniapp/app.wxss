@@ -1,0 +1,26 @@
+page {
+  background-color: #f7f9f5;
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  color: #262626;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+  margin: 0 24rpx 20rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 16rpx;
+}
+
+.green  { color: #52c41a; }
+.orange { color: #fa8c16; }
+.red    { color: #ff4d4f; }
+.gray   { color: #8c8c8c; }
+.bold   { font-weight: 600; }

@@ -1,0 +1,127 @@
+<view class="page">
+
+  <!-- ── Header ── -->
+  <view class="header">
+    <text class="header-title">{{i_title}}</text>
+    <view class="back-btn" bindtap="goBack">{{i_backBtn}}</view>
+  </view>
+
+  <!-- ── Child profile card ── -->
+  <view class="profile-card">
+    <view class="avatar">
+      <text class="avatar-emoji">👦</text>
+    </view>
+    <view class="profile-info">
+      <text class="profile-name">{{childName}}</text>
+      <text class="profile-grade">{{grade}}</text>
+    </view>
+    <view class="profile-status">
+      <view class="status-dot {{sessionActive ? 'dot-green' : 'dot-gray'}}"></view>
+      <text class="status-label">{{stateLabel}}</text>
+      <text class="status-round">{{roundInfo}}</text>
+    </view>
+  </view>
+
+  <!-- ── Live camera feed ── -->
+  <view class="cam-wrap" wx:if="{{showCamera && connected}}">
+    <image class="cam-img" src="{{frameUrl}}" mode="aspectFill"/>
+    <view class="cam-badge">
+      <view class="cam-dot"></view>
+      <text class="cam-lbl">LIVE</text>
+    </view>
+  </view>
+
+  <!-- ── Today overview ── -->
+  <view class="section-header">{{i_overview}}</view>
+  <view class="stats-grid">
+    <view class="stat-card">
+      <text class="stat-icon">🍅</text>
+      <text class="stat-val green">{{todayFocus}}</text>
+      <text class="stat-name">{{statNames[0]}}</text>
+      <text class="stat-target">{{statTargets[0]}}</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-icon">🔄</text>
+      <text class="stat-val green">{{todayRounds}}</text>
+      <text class="stat-name">{{statNames[1]}}</text>
+      <text class="stat-target">{{statTargets[1]}}</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-icon">⚡</text>
+      <text class="stat-val orange">{{distractCount}}</text>
+      <text class="stat-name">{{statNames[2]}}</text>
+      <text class="stat-target">{{statTargets[2]}}</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-icon">🪑</text>
+      <text class="stat-val {{postureKey === 'good' ? 'green' : postureKey === 'ok' ? 'orange' : 'red'}}">{{postureStatus}}</text>
+      <text class="stat-name">{{statNames[3]}}</text>
+      <text class="stat-target">{{statTargets[3]}}</text>
+    </view>
+  </view>
+
+  <!-- ── Event log ── -->
+  <view class="section-header">
+    <text>{{i_eventLog}}</text>
+    <text class="see-all">{{i_seeAll}}</text>
+  </view>
+  <view class="events-card">
+    <view wx:if="{{!events.length}}" class="empty-tip">{{i_noEvents}}</view>
+    <view wx:for="{{events}}" wx:key="id" class="event-row">
+      <view class="ev-dot" style="background:{{item.color}}"></view>
+      <text class="ev-time">{{item.timeStr}}</text>
+      <text class="ev-label">{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- ── Weekly trend ── -->
+  <view class="section-header">
+    <text>{{i_weekTrend}}</text>
+    <view class="week-avg-badge">
+      <text>{{i_weekAvgLabel}} </text>
+      <text class="green bold">{{weekAvg}}</text>
+    </view>
+  </view>
+  <view class="chart-card">
+    <view class="chart-bars">
+      <view wx:for="{{weekData}}" wx:key="day" class="chart-col">
+        <text class="bar-label-top">{{item.label}}</text>
+        <view class="bar-track">
+          <view class="bar-fill" style="height:{{item.heightPct}}%;background:{{item.color}};"></view>
+        </view>
+        <text class="bar-day">{{item.day}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ── Privacy ── -->
+  <view class="privacy-row">
+    <view class="privacy-item">
+      <text class="privacy-icon">🛡️</text>
+      <view>
+        <text class="privacy-title">{{i_privacy[0]}}</text>
+        <text class="privacy-sub">{{i_privacy[1]}}</text>
+      </view>
+    </view>
+    <view class="privacy-item">
+      <text class="privacy-icon">📷</text>
+      <view>
+        <text class="privacy-title">{{i_privacy[2]}}</text>
+        <text class="privacy-sub">{{i_privacy[3]}}</text>
+      </view>
+    </view>
+    <view class="privacy-item">
+      <text class="privacy-icon">👨‍👩‍👧</text>
+      <view>
+        <text class="privacy-title">{{i_privacy[4]}}</text>
+        <text class="privacy-sub">{{i_privacy[5]}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Offline -->
+  <view class="offline-bar" wx:if="{{!connected}}">
+    <text>{{i_offline}}</text>
+  </view>
+
+</view>

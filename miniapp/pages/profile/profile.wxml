@@ -1,0 +1,56 @@
+<view class="page">
+  <view class="header">
+    <text class="header-title">{{lang === 'zh' ? '👤 我的' : '👤 Profile'}}</text>
+  </view>
+
+  <view class="profile-hero">
+    <view class="avatar">👦</view>
+    <text class="name">{{childName}}</text>
+    <text class="grade">{{grade}}</text>
+  </view>
+
+  <!-- Main actions -->
+  <view class="menu-card">
+    <view class="menu-item" bindtap="goParent">
+      <text class="menu-icon">👨‍👩‍👧</text>
+      <text class="menu-label">{{menuItems[0]}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="toggleLang">
+      <text class="menu-icon">🌏</text>
+      <text class="menu-label">{{menuItems[1]}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="editName">
+      <text class="menu-icon">✏️</text>
+      <text class="menu-label">{{menuItems[2]}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- Settings -->
+  <view class="menu-card">
+    <view class="menu-item" bindtap="openReminders">
+      <text class="menu-icon">🔔</text>
+      <text class="menu-label">{{menuItems[3]}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="openGoals">
+      <text class="menu-icon">🎯</text>
+      <text class="menu-label">{{menuItems[4]}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="openAbout">
+      <text class="menu-icon">ℹ️</text>
+      <text class="menu-label">{{menuItems[5]}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="server-info">
+    <text class="server-label">{{lang === 'zh' ? '后端地址' : 'Backend'}}: {{baseUrl}}</text>
+    <text class="server-status {{connected ? 'ok' : 'err'}}">
+      {{connected ? (lang === 'zh' ? '● 已连接' : '● Connected') : (lang === 'zh' ? '● 未连接' : '● Offline')}}
+    </text>
+  </view>
+</view>
