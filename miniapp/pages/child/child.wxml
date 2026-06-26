@@ -31,10 +31,12 @@
     </view>
     <view class="speech-bubble">
       <text class="speech-text">{{aiMessage}}</text>
-      <view class="speak-stop" wx:if="{{isSpeaking}}" bindtap="stopSpeak">
-        <text class="speak-stop-icon">⏹</text>
-      </view>
     </view>
+  </view>
+
+  <!-- ── Stop speaking bar ── -->
+  <view class="speak-stop-bar" wx:if="{{isSpeaking}}" bindtap="stopSpeak">
+    <text class="speak-stop-bar-text">🔇  Tap to stop speaking</text>
   </view>
 
   <!-- ── Camera preview ── -->
