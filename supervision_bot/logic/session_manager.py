@@ -119,7 +119,9 @@ class SessionManager:
             except Exception as e:
                 print(f"[Bot] CV pipeline error (continuing): {type(e).__name__}: {e}",
                       flush=True)
-            await asyncio.sleep(1.0 / config.TARGET_FPS)
+            # Sleep a tiny amount to yield to async tasks, but not lock the CV loop to 15fps
+            # This allows reading frames much faster, completely eliminating video pauses
+            await asyncio.sleep(0.01)
 
     def _process_frame(self, frame) -> None:
         import cv2

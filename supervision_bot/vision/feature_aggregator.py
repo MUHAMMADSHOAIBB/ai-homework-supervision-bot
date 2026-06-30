@@ -248,6 +248,12 @@ class FeatureAggregator:
             genuine = False
         if config.REQUIRE_HEAD_DOWN_FOR_WORK and not head_down:
             genuine = False
+        
+        # Critical Override: If a phone is detected, the student is NOT working.
+        if yolo.phone_detected:
+            genuine = False
+            work = 0.0 # Force score to 0 immediately
+            
         if not genuine:
             work = min(work, config.WORK_CONFIDENCE_THRESHOLD - 1.0)
 

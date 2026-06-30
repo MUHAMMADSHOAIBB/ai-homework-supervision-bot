@@ -43,17 +43,17 @@ FLOW_IDLE_SECONDS   = 5     # Pen idle 5 seconds during focus = alert
 # Combine several weak signals into ONE robust "is the child working?" score (0-100).
 # Position-independent: works at a desk, lying on the floor, any camera angle.
 # Weights sum to 100 — a fully-confident writer scores ~100.
-WORK_WEIGHT_PEN_GRIP   = 35   # Hand in pen-holding grip (strongest signal)
+WORK_WEIGHT_PEN_GRIP   = 35   # Hand in pen-holding grip
 WORK_WEIGHT_WRIST_MOVE = 20   # Writing hand making small rhythmic motion
 WORK_WEIGHT_HEAD_DOWN  = 15   # Head pitched down toward paper
 WORK_WEIGHT_FLOW       = 15   # Optical-flow motion in frame
 WORK_WEIGHT_BOOK       = 10   # YOLO sees a book/paper
 WORK_WEIGHT_FACE       =  5   # Face present (baseline)
 
-WORK_CONFIDENCE_THRESHOLD = 40   # Score >= this = "working" (suppress false alerts)
+WORK_CONFIDENCE_THRESHOLD = 45   # Score >= this = "working"
 WRIST_MOTION_MIN  = 0.002   # Normalized per-frame wrist displacement = active hand
 WRIST_MOTION_MAX  = 0.06    # Above this = big gesture (waving), not writing
-HEAD_DOWN_PITCH   = 8       # Pitch beyond this (down) = looking at paper
+HEAD_DOWN_PITCH   = 15      # Pitch beyond this (down) = looking at paper
 HEAD_YAW_MAX_FOR_WORK = 35  # A real writer faces the paper; turned > this = not writing
 
 # Anti-cheat: real writing requires MOVEMENT. A child can hold a pen still in a

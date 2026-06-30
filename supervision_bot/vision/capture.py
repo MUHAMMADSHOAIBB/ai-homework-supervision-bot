@@ -63,10 +63,13 @@ class CameraCapture:
             self._cap.set(cv2.CAP_PROP_FPS, self._fps)
             print(f"[Camera] Opened camera index {self._camera_index} OK", flush=True)
             self._camera_error = None
-            interval = 1.0 / self._fps
+            
+            # Remove artificial interval sleep. The camera hardware will naturally
+            # block cap.read() to its own framerate (e.g. 30fps). Reading as fast
+            # as possible prevents OpenCV's internal frame buffer from filling up,
+            # which eliminates video delay and stuttering/pauses.
             consecutive_failures = 0
             while not self._stop_event.is_set():
-                t0 = time.monotonic()
                 ret, frame = self._cap.read()
                 if ret and frame is not None:
                     self._buffer.append(frame)
@@ -76,10 +79,7 @@ class CameraCapture:
                     if consecutive_failures == 30:
                         print(f"[Camera] WARNING: 30 consecutive read failures — "
                               f"camera may be disconnected or in use", flush=True)
-                elapsed = time.monotonic() - t0
-                sleep_time = interval - elapsed
-                if sleep_time > 0:
-                    time.sleep(sleep_time)
+                    time.sleep(0.05) # Only sleep if the camera is failing
         except Exception as e:
             print(f"[Camera] FATAL error in capture loop: {e}", flush=True)
             self._camera_error = str(e)
