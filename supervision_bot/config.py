@@ -155,7 +155,7 @@ CHILD_AGE  = 10
 # ── LLM Coach (yunwu.ai — OpenAI-compatible) ──────────────────────────────────
 LLM_ENABLED        = True
 LLM_API_BASE       = "https://yunwu.ai/v1"
-LLM_API_KEY        = "sk-zMbxAG2DyZMD3OR6RCSd81TMnq5hVauIHU973xWaoLR8Qney"
+LLM_API_KEY        = ""
 LLM_MODEL          = "deepseek-v4-flash"
 LLM_FALLBACK_MODEL = "deepseek-chat"   # used when primary hits 429
 LLM_MAX_HISTORY    = 10    # conversation turns to remember
