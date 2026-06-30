@@ -37,7 +37,7 @@ MIN_FACE_CONF_FOR_ALERTS = 0.55
 
 # Writing activity
 FLOW_IDLE_THRESHOLD = 8.0   # Optical flow magnitude below this = pen idle
-FLOW_IDLE_SECONDS   = 5     # Pen idle 5 seconds during focus = alert
+FLOW_IDLE_SECONDS   = 8     # Pen idle 5 seconds during focus = alert
 
 # ── Work-confidence fusion ────────────────────────────────────────────────────
 # Combine several weak signals into ONE robust "is the child working?" score (0-100).
